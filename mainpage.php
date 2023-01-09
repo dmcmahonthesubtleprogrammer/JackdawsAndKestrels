@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src='../Project1/mainpage.js'>
+<script src="../Jackdaws and Kestrels/mainpage.js">
 </script>
 <style>
 #jackdaw {

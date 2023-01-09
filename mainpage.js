@@ -1,83 +1,103 @@
-let posx = 0;
-let posy = 0;
+const startx = 1075;
+const starty = 650;
+let posx = startx;
+let posy = starty;
 let keys = {
     up: false,
     down: false,
     left: false,
-    right: false
+    right: false,
+    enter: false
+};
+let states = {
+    initialized: false,
+    started: false
 };
 document.addEventListener('keydown', (event) => {
     let name = event.key;
-    const elem = document.getElementById("jackdaw");
     if(name.toLowerCase()==='w')
     {
         keys.up = true;
-        console.log(keys.up);
     }
     if(name.toLowerCase()==='s')
     {
         keys.down = true;
-        console.log(keys.down);
     }
     if(name.toLowerCase()==='a')
     {
         keys.left = true;
-        console.log(keys.left);
     }
     if(name.toLowerCase()==='d')
     {
         keys.right = true;
-        console.log(keys.right);
+    }
+    if(name.toLowerCase()==='enter')
+    {
+        keys.enter = true;
     }
 },false);
 
 document.addEventListener('keyup', (event) => {
     let name = event.key;
-    const elem = document.getElementById("jackdaw");
     if(name.toLowerCase()==='w')
     {
         keys.up = false;
-        console.log(keys.up);
     }
     if(name.toLowerCase()==='s')
     {
         keys.down = false;
-        console.log(keys.down);
     }
     if(name.toLowerCase()==='a')
     {
         keys.left = false;
-        console.log(keys.left);
     }
     if(name.toLowerCase()==='d')
     {
         keys.right = false;
-        console.log(keys.right);
+    }
+    if(name.toLowerCase()==='enter')
+    {
+        keys.enter = false;
     }
 },false);
-
-document.addEventListener('keypress', (event) => {
-    const elem = document.getElementById("jackdaw");
+setInterval(() => {
+    const jackdaw = document.getElementById("jackdaw");
+    if(states.started)
+    {
     if(keys.up)
     {
-        posy=posy-10;
-        elem.style.top = posy + "px";
+        posy=posy-5;
+        jackdaw.style.top = posy + "px";
     }
     if(keys.down)
     {
-        posy=posy+10;
-        elem.style.top = posy + "px";
+        posy=posy+5;
+        jackdaw.style.top = posy + "px";
     }
     if(keys.left)
     {
-        posx=posx-10;
-        elem.style.left = posx + "px";
+        posx=posx-5;
+        jackdaw.style.left = posx + "px";
     }
     if(keys.right)
     {
-        posx=posx+10;
-        elem.style.left = posx + "px";
+        posx=posx+5;
+        jackdaw.style.left = posx + "px";
     }
-},false);
+    }
+    if(!states.started)
+    {
+    if(keys.enter)
+    {
+        states.initialized = true;
+    }
+    if(states.initialized)
+    {
+        jackdaw.style.top = posy + "px";
+        jackdaw.style.left = posx + "px";
+        states.started = true;
+    }
+    }
+}, 5);
 
 console.log('Code is running');
