@@ -1,0 +1,21 @@
+{
+  "name": "jackdaws_and_kestrels",
+  "version": "0.0.0",
+  "description": "A game about the natural harmony of living creatures clawing at each other's throats.",
+  "main": "mainpage.js",
+  "scripts": {
+    "test": "run-dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://dillonjmcmahon@dev.azure.com/dillonjmcmahon/Jackdaws%20and%20Kestrels/_git/Jackdaws%20and%20Kestrels"
+  },
+  "keywords": [
+    "game",
+    "birds",
+    "predators",
+    "entropy"
+  ],
+  "author": "Dillon McMahon",
+  "license": "ISC"
+}
