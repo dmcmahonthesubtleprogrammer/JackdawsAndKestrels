@@ -1,4 +1,3 @@
-//const fx = require('fx');
 let posx = 0;
 let posy = 0;
 let keys = {
