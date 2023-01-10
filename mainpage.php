@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="../Jackdaws and Kestrels/mainpage.js">
+<script src="../Jackdaws and Kestrels/mainpage.js" defer>
 </script>
 <style>
 #jackdaw {
@@ -12,7 +12,7 @@
 }
 </style>
 </head>
-<body>
+<body id = "body">
     <div id ="jackdaw"></div>
 </body>
 </html>

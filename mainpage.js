@@ -1,7 +1,51 @@
-const startx = 1075;
-const starty = 650;
-let posx = startx;
-let posy = starty;
+//let startx = 1075;
+//let starty = 650;
+const spawns = [];
+class Spawn {
+    width = "100px";
+    height = "100px";
+    color = "brown";
+    entityName = "";
+    xposition = 0;
+    yposition = 0;
+    component = null;
+    constructor(entityName,xposition,yposition) {
+    this.entityName = entityName;
+    this.xposition = xposition;
+    this.yposition = yposition;
+    this.component = document.createElement("div");
+    this.component.className = "nest";
+    this.component.style.position = "relative";
+    this.component.style.width = this.width;
+    this.component.style.height = this.height;
+    this.component.style.backgroundColor = this.color;
+    this.component.style.top = this.yposition - 100 + "px";
+    this.component.style.left = this.xposition + "px";
+    this.component.style.zIndex = -1;
+    document.body.appendChild(this.component);
+    }
+    getXPosition() {
+        return this.xposition;
+    }
+    getYPosition() {
+        return this.yposition;
+    }
+}
+//document.body.appendChild(null);
+//2000
+//1300
+spawns.push(new Spawn("Jackdaw", Math.floor(Math.random() * 1900),Math.floor(Math.random() * 1200)));
+let nestVis = spawns.find((value,index,obj) => {
+    return value.entityName = "Jackdaw";
+}).component.style.visibility = "visible";
+let posx = spawns.find((value,index,obj) => {
+    return value.entityName = "Jackdaw";
+}).getXPosition()+25;
+let posy = spawns.find((value,index,obj) => {
+    return value.entityName = "Jackdaw";
+}).getYPosition()-25;
+//console.log(posx);
+//console.log(spawns);
 let keys = {
     up: false,
     down: false,
