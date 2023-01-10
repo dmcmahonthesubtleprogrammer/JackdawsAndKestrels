@@ -34,7 +34,7 @@ class Spawn {
 //document.body.appendChild(null);
 //2000
 //1300
-spawns.push(new Spawn("Jackdaw", Math.floor(Math.random() * 1900),Math.floor(Math.random() * 1200)));
+spawns.push(new Spawn("Jackdaw", Math.floor(Math.random() * 2000),Math.floor(Math.random() * 1200)));
 let nestVis = spawns.find((value,index,obj) => {
     return value.entityName = "Jackdaw";
 }).component.style.visibility = "visible";
@@ -110,23 +110,35 @@ setInterval(() => {
     {
     if(keys.up)
     {
-        posy=posy-5;
-        jackdaw.style.top = posy + "px";
+        if(posy > 0)
+        {
+            posy=posy-2;
+            jackdaw.style.top = posy + "px";
+        }
     }
     if(keys.down)
     {
-        posy=posy+5;
-        jackdaw.style.top = posy + "px";
+        if(posy < 1300)
+        {
+            posy=posy+2;
+            jackdaw.style.top = posy + "px";
+        }
     }
     if(keys.left)
     {
-        posx=posx-5;
-        jackdaw.style.left = posx + "px";
+        if(posx > 0)
+        {
+            posx=posx-2;
+            jackdaw.style.left = posx + "px";
+        }
     }
     if(keys.right)
     {
-        posx=posx+5;
-        jackdaw.style.left = posx + "px";
+        if(posx < 2100)
+        {
+            posx=posx+2;
+            jackdaw.style.left = posx + "px";
+        }
     }
     }
     if(!states.started)
