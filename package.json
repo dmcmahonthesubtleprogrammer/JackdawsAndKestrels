@@ -17,5 +17,8 @@
     "entropy"
   ],
   "author": "Dillon McMahon",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "craftyjs": "^0.9.0"
+  }
 }
