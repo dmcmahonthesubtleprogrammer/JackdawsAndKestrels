@@ -13,7 +13,7 @@ Crafty.init();
          this.xposition = xposition;
          this.yposition = yposition;
          this.speed = speed;
-         this.graphic = Crafty.e("2D, Canvas, Color, Fourway")
+         this.graphic = Crafty.e("2D, Canvas, Color, Fourway, Renderable")
          .attr({x:this.xposition, y:this.yposition, w:this.width, h:this.height, z:1})
          .color(this.color)
          .fourway(3);
@@ -41,16 +41,17 @@ Crafty.init();
   }
     const players = [];
     const nest = [];
+    let safex = 0;
+    let safey = 0;
     let trees = [];
     let required = 0;
     let score = 0;
     document.body.style.backgroundColor = "chartreuse";
-    players.push(new Player("Jackdaw",Math.random() * 2000,Math.random() * 1350,5));
     for(let i = 0; i < 100; i++)
     {
         trees.push(new Tree("Tree",Math.random() * 2000,Math.random() * 1350));
     }
-    for(let i = 0; i < 1; i++)
+    for(let i = 0; i < 50; i++)
     {
         let x = Math.random() * 2000;
             let y = Math.random() * 1350;
@@ -72,6 +73,24 @@ Crafty.init();
         trees.push(new Tree("Egg",x,y));
         required++;
     }
+    let spawnx = Math.random() * 2000;
+    let spawny = Math.random() * 1350;
+    while(
+        trees.find((value,index,obj) => {
+            if(spawnx < value.graphic.x + value.graphic.w && 
+                spawnx + 50 > value.graphic.x &&
+                spawny < value.graphic.y + value.graphic.h &&
+            50 + spawny > value.graphic.y) {
+                return true;
+            }
+            return false;
+        })
+    )
+    {
+        spawnx = Math.random() * 2000;
+        spawny = Math.random() * 1350;
+    }
+    players.push(new Player("Jackdaw",spawnx,spawny,5));
     const player = players.find((value,index,obj) => {
         return value.playerName === "Jackdaw";
     });
@@ -81,6 +100,7 @@ Crafty.init();
             left: false,
             right: false,
             enter: false,
+            space: false,
           };
         const collisionDirections = {
             up: false,
@@ -91,6 +111,9 @@ Crafty.init();
           const states = {
             initialized: false,
             started: false,
+            highFlyingReady: true,
+            highFlying: false,
+            cooldown: false,
           };
           document.addEventListener(
             "keydown",
@@ -110,6 +133,9 @@ Crafty.init();
               }
               if (name.toLowerCase() === "enter") {
                 keys.enter = true;
+              }
+              if (event.code.toLowerCase() === "space") {
+                keys.space = true;
               }
             },
             false
@@ -134,54 +160,70 @@ Crafty.init();
               if (name.toLowerCase() === "enter") {
                 keys.enter = false;
               }
+              if (event.code.toLowerCase() === "space") {
+                keys.space = false;
+              }
             },
             false
           );
           let collide = false;
+          let repositionTicks = 0;
+          let highFlyingTicks = 0;
+          let abilityCooldownTicks = 0;
 setInterval(() => {
     if (states.started) {
-
-    let collide = trees.find((value,index,obj) => {
+        repositionTicks++;
+        let collide = trees.find((value,index,obj) => {
             if (
-                player.graphic.x < value.graphic.x + value.graphic.w && 
+                (player.graphic.x < value.graphic.x + value.graphic.w && 
                 player.graphic.x + player.graphic.w > value.graphic.x &&
                 player.graphic.y < value.graphic.y + value.graphic.h &&
-                player.graphic.h + player.graphic.y > value.graphic.y
+                player.graphic.h + player.graphic.y > value.graphic.y) && (!states.highFlying)
               ) {
                 // Collision detected!
                 return true;
               }
         });
+        if(repositionTicks>=50)
+        {
+            if(!collide && !states.highFlying)
+            {
+                safex = player.graphic.x;
+                safey = player.graphic.y;
+            }
+            repositionTicks = 0;
+        }
+
+        if(states.cooldown)
+        {
+            if(abilityCooldownTicks<1500)
+            {
+                abilityCooldownTicks++;
+            }else{
+                states.cooldown = false;
+                states.highFlyingReady = true;
+                abilityCooldownTicks = 0;
+                console.log("Ability ready!");
+            }
+        }
 
         if(collide)
         {
             if(player.graphic.y + player.graphic.h > collide.graphic.y + collide.graphic.h)
             {
                 collisionDirections.up = true;
-                collisionDirections.down = false;
-                collisionDirections.left = false;
-                collisionDirections.right = false;
             }
             if(player.graphic.y < collide.graphic.y)
             {
                 collisionDirections.down = true;
-                collisionDirections.up = false;
-                collisionDirections.left = false;
-                collisionDirections.right = false;
             }
             if(player.graphic.x + player.graphic.w > collide.graphic.x + collide.graphic.w)
             {
                 collisionDirections.left = true;
-                collisionDirections.up = false;
-                collisionDirections.down = false;
-                collisionDirections.right = false;
             }
             if(player.graphic.x < collide.graphic.x)
             {
                 collisionDirections.right = true;
-                collisionDirections.up = false;
-                collisionDirections.down = false;
-                collisionDirections.left = false;
             }
             if(collide.entityName === "Egg")
             {
@@ -214,45 +256,142 @@ setInterval(() => {
             document.body.style.backgroundRepeat = `no-repeat`;
             document.body.style.backgroundSize = `100%`;
         }
-
-        if(collisionDirections.up)
-        {
-                //if(Math.abs(player.graphic.y < (collide.graphic.y + collide.graphic.h/2)) && Math.abs(player.graphic.y < (collide.graphic.y + collide.graphic.h/2)))
-                //{
-                    player.graphic.y = (collide.graphic.y + collide.graphic.h) + 1;
-                //}
-        }
-        else if(collisionDirections.down)
-        {
-                player.graphic.y = (collide.graphic.y - player.graphic.h) - 1;
-        }
-        else if(collisionDirections.left)
-        {
-                player.graphic.x = (collide.graphic.x + collide.graphic.w) + 1;
-        }
-        else if(collisionDirections.right)
-        {
-                player.graphic.x = (collide.graphic.x - player.graphic.w) - 1;
-        }
       if (keys.up) {
         if (player.graphic.y > 0 && !(collide && collisionDirections.up)) {
             player.graphic.y-=1;
+        }else if(collide)
+        {
+            if(collisionDirections.up)
+            {
+                player.graphic.y = player.graphic.y + 1;
+            }
+            if(collisionDirections.down)
+            {
+                player.graphic.y = player.graphic.y - 1;
+            }
+            if(collisionDirections.left)
+            {
+                player.graphic.x = player.graphic.x + 1;
+            }
+            if(collisionDirections.right)
+            {
+                player.graphic.x = player.graphic.x - 1;
+            }
+            if(collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right)
+            {
+                player.graphic.x = safex;
+                player.graphic.y = safey;
+            }
         }
       }
       if (keys.down) {
         if (player.graphic.y < 1350 && !(collide && collisionDirections.down)) {
             player.graphic.y+=1;
+        }else if(collide)
+        {
+            if(collisionDirections.up)
+            {
+                player.graphic.y = player.graphic.y + 1;
+            }
+            if(collisionDirections.down)
+            {
+                player.graphic.y = player.graphic.y - 1;
+            }
+            if(collisionDirections.left)
+            {
+                player.graphic.x = player.graphic.x + 1;
+            }
+            if(collisionDirections.right)
+            {
+                player.graphic.x = player.graphic.x - 1;
+            }
+            if(collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right)
+            {
+                player.graphic.x = safex;
+                player.graphic.y = safey;
+            }
         }
       }
       if (keys.left) {
         if (player.graphic.x > 0 && !(collide && collisionDirections.left)) {
             player.graphic.x-=1;
+        }else if(collide)
+        {
+            if(collisionDirections.up)
+            {
+                player.graphic.y = player.graphic.y + 1;
+            }
+            if(collisionDirections.down)
+            {
+                player.graphic.y = player.graphic.y - 1;
+            }
+            if(collisionDirections.left)
+            {
+                player.graphic.x = player.graphic.x + 1;
+            }
+            if(collisionDirections.right)
+            {
+                player.graphic.x = player.graphic.x - 1;
+            }
+            if(collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right)
+            {
+                player.graphic.x = safex;
+                player.graphic.y = safey;
+            }
         }
       }
       if (keys.right) {
         if (player.graphic.x < 2000 && !(collide && collisionDirections.right)) {
             player.graphic.x+=1;
+        }else if(collide)
+        {
+            if(collisionDirections.up)
+            {
+                player.graphic.y = player.graphic.y + 1;
+            }
+            if(collisionDirections.down)
+            {
+                player.graphic.y = player.graphic.y - 1;
+            }
+            if(collisionDirections.left)
+            {
+                player.graphic.x = player.graphic.x + 1;
+            }
+            if(collisionDirections.right)
+            {
+                player.graphic.x = player.graphic.x - 1;
+            }
+            if(collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right)
+            {
+                player.graphic.x = safex;
+                player.graphic.y = safey;
+            }
         }
+      }
+      if(keys.space)
+      {
+        if(states.highFlyingReady)
+        {
+            states.highFlyingReady = false;
+            states.highFlying = true;
+            player.graphic.attr({alpha:0.5});
+        }
+      }
+      if(states.highFlying)
+      {
+        if(highFlyingTicks<500)
+        {
+            highFlyingTicks++;
+        }else{
+            states.highFlying = false;
+            player.graphic.attr({alpha:1.0});
+            states.cooldown = true;
+            console.log("cooldown started")
+            highFlyingTicks = 0;
+        }
+      }
+      else{
+        player.graphic.attr({alpha:1.0});
       }
     }
     if (!states.started) {
