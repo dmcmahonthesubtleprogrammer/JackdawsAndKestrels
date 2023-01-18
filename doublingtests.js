@@ -27,6 +27,21 @@ Crafty.init();
         xposition = 0;
         yposition = 0;
         graphic = null;
+        treeStates = {
+            alive: true,
+            thinks: false,
+            idle: false,
+            wandering: false,
+            chasing: false
+        }
+        speed = 0;
+        maxSpeed = 0;
+        sight = 0;
+        idleTime = 0;
+        wanderTime = 0;
+        wanderPoint = [];
+        chaseTarget = null;
+        actionTicks = 0;
         constructor(entityName, xposition, yposition) {
             this.entityName = entityName;
             this.xposition = xposition;
@@ -35,6 +50,16 @@ Crafty.init();
             if(entityName === "Egg")
             {
                 this.graphic.color("white");
+                this.graphic.attr({w:50,h:50,z:1});
+            }else if(entityName === "Kestrel")
+            {
+                this.treeStates.thinks = true;
+                this.treeStates.idle = true;
+                this.maxSpeed = 0.5;
+                this.sight = 500;
+                this.idleTime = 500;
+                this.wanderTime = 1500;
+                this.graphic.color("chocolate");
                 this.graphic.attr({w:50,h:50,z:1});
             }
         }
@@ -73,6 +98,27 @@ Crafty.init();
         trees.push(new Tree("Egg",x,y));
         required++;
     }
+    for(let i = 0; i < 10; i++)
+    {
+        let kestx = Math.random() * 2000;
+            let kesty = Math.random() * 1350;
+        while(
+            trees.find((value,index,obj) => {
+                if(kestx < value.graphic.x + value.graphic.w && 
+                    kestx + 50 > value.graphic.x &&
+                    kesty < value.graphic.y + value.graphic.h &&
+                50 + kesty > value.graphic.y) {
+                    return true;
+                }
+                return false;
+            })
+        )
+        {
+            kestx = Math.random() * 2000;
+            kesty = Math.random() * 1350;
+        }
+        trees.push(new Tree("Kestrel",kestx,kesty));
+    }
     let spawnx = Math.random() * 2000;
     let spawny = Math.random() * 1350;
     while(
@@ -91,7 +137,7 @@ Crafty.init();
         spawny = Math.random() * 1350;
     }
     players.push(new Player("Jackdaw",spawnx,spawny,5));
-    const player = players.find((value,index,obj) => {
+    let player = players.find((value,index,obj) => {
         return value.playerName === "Jackdaw";
     });
         const keys = {
@@ -184,6 +230,7 @@ setInterval(() => {
                 return true;
               }
         });
+
         if(repositionTicks>=50)
         {
             if(!collide && !states.highFlying)
@@ -237,6 +284,21 @@ setInterval(() => {
                     return false;
                 })] = new Tree("Null",-1000,-1000);
                 collide.graphic.destroy();
+                const collected = new Audio('eggCrack.mp3'); 
+                collected.play();
+            }
+            if(collide.entityName === "Kestrel")
+            {
+                trees.forEach((value,index,array) => {
+                    value.graphic.destroy();
+                });
+                trees = [];
+                player.graphic.destroy();
+                document.body.style.backgroundImage = `url("../Jackdaws and Kestrels/jackdawfail.jpg")`;
+                document.body.style.backgroundRepeat = `no-repeat`;
+                document.body.style.backgroundSize = `100%`;
+                const deathSound = new Audio('jackdawDeath.mp3'); 
+                deathSound.play();
             }
         }else{
             collisionDirections.up = false;
@@ -256,6 +318,7 @@ setInterval(() => {
             document.body.style.backgroundRepeat = `no-repeat`;
             document.body.style.backgroundSize = `100%`;
         }
+
       if (keys.up) {
         if (player.graphic.y > 0 && !(collide && collisionDirections.up)) {
             player.graphic.y-=1;
@@ -277,7 +340,7 @@ setInterval(() => {
             {
                 player.graphic.x = player.graphic.x - 1;
             }
-            if(collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right)
+            if((collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right) && collide.entityName === "Tree")
             {
                 player.graphic.x = safex;
                 player.graphic.y = safey;
@@ -305,7 +368,7 @@ setInterval(() => {
             {
                 player.graphic.x = player.graphic.x - 1;
             }
-            if(collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right)
+            if((collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right) && collide.entityName === "Tree")
             {
                 player.graphic.x = safex;
                 player.graphic.y = safey;
@@ -333,7 +396,7 @@ setInterval(() => {
             {
                 player.graphic.x = player.graphic.x - 1;
             }
-            if(collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right)
+            if((collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right) && collide.entityName === "Tree")
             {
                 player.graphic.x = safex;
                 player.graphic.y = safey;
@@ -361,7 +424,7 @@ setInterval(() => {
             {
                 player.graphic.x = player.graphic.x - 1;
             }
-            if(collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right)
+            if((collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right) && collide.entityName === "Tree")
             {
                 player.graphic.x = safex;
                 player.graphic.y = safey;
@@ -374,9 +437,10 @@ setInterval(() => {
         {
             states.highFlyingReady = false;
             states.highFlying = true;
-            player.graphic.attr({alpha:0.5});
+            player.graphic.attr({alpha:0.5,z:2});
         }
       }
+
       if(states.highFlying)
       {
         if(highFlyingTicks<500)
@@ -393,6 +457,96 @@ setInterval(() => {
       else{
         player.graphic.attr({alpha:1.0});
       }
+      trees.forEach((value,index,array) => {
+        if(value.entityName === "Kestrel")
+        {
+            let threatenedEgg = trees.find((value, index, obj) => {
+                if(value.entityName === "Egg" && (Math.abs(value.graphic.x+(value.graphic.w/2) - player.graphic.x+(player.graphic.w/2)) < 500 && Math.abs(value.graphic.y+(value.graphic.h/2) - player.graphic.y+(player.graphic.h/2)) < 500))
+                {
+                    return true;
+                }
+                return false;
+            });
+            if(threatenedEgg)
+            {
+                if((Math.abs(player.graphic.x+(player.graphic.w/2) - value.graphic.x+(value.graphic.w/2)) < 500 && Math.abs(player.graphic.y+(player.graphic.h/2) - value.graphic.y+(value.graphic.h/2)) < 500))
+                {
+                    value.treeStates.idle = false;
+                    value.treeStates.wandering = false;
+                    value.chaseTarget = player;
+                    value.treeStates.chasing = true;
+                }
+            }
+            if(value.treeStates.idle)
+            {
+                if(value.actionTicks < value.idleTime)
+                {
+                    value.actionTicks++;
+                }else{
+                    value.treeStates.idle = false;
+                    value.treeStates.wandering = true;
+                    value.wanderPoint = [Math.random() * 2000, Math.random() * 1350];
+                    value.speed = value.maxSpeed;
+                    value.actionTicks = 0;
+                }
+            }else if(value.treeStates.wandering)
+            {
+                if(value.actionTicks < value.wanderTime)
+                {
+                    if(value.graphic.x > value.wanderPoint[0])
+                    {
+                        value.graphic.x = value.graphic.x - value.speed;
+                    }
+                    if(value.graphic.x < value.wanderPoint[0])
+                    {
+                        value.graphic.x = value.graphic.x + value.speed;
+                    }
+                    if(value.graphic.y > value.wanderPoint[1])
+                    {
+                        value.graphic.y = value.graphic.y - value.speed;
+                    }
+                    if(value.graphic.y < value.wanderPoint[1])
+                    {
+                        value.graphic.y  = value.graphic.y + value.speed;
+                    }
+                    value.actionTicks++;
+                }else{
+                    value.treeStates.wandering = false;
+                    value.treeStates.idle = true;
+                    value.wanderPoint = [];
+                    value.speed = 0;
+                    value.actionTicks = 0;
+                }
+            }else if(value.treeStates.chasing)
+            {
+                if((Math.abs(player.graphic.x+(player.graphic.w/2) - value.graphic.x+(value.graphic.w/2)) < 500 && Math.abs(player.graphic.y+(player.graphic.h/2) - value.graphic.y+(value.graphic.h/2)) < 500))
+                {
+                    if(value.graphic.x < player.graphic.x)
+                    {
+                        value.graphic.x = value.graphic.x + value.speed;
+                    }
+                    if(value.graphic.x > player.graphic.x)
+                    {
+                        value.graphic.x = value.graphic.x - value.speed;
+                    }
+                    if(value.graphic.y < player.graphic.y)
+                    {
+                        value.graphic.y  = value.graphic.y + value.speed;
+                    }
+                    if(value.graphic.y > player.graphic.y)
+                    {
+                        value.graphic.y = value.graphic.y - value.speed;
+                    }
+                }else{
+                    value.treeStates.chasing = false;
+                    value.treeStates.wandering = true;
+                    value.wanderPoint = [Math.random() * 2000, Math.random() * 1350];
+                    value.speed = value.maxSpeed;
+                    value.actionTicks = 0;
+                }
+            }
+        }
+      });
     }
     if (!states.started) {
       if (keys.enter) {
