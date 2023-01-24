@@ -123,10 +123,10 @@ Crafty.init();
     let spawny = Math.random() * 1350;
     while(
         trees.find((value,index,obj) => {
-            if(spawnx < value.graphic.x + value.graphic.w && 
-                spawnx + 50 > value.graphic.x &&
-                spawny < value.graphic.y + value.graphic.h &&
-            50 + spawny > value.graphic.y) {
+            if((spawnx < value.graphic.x + value.graphic.w + 50 && 
+                spawnx + 50 > value.graphic.x - 50 &&
+                spawny < value.graphic.y + value.graphic.h + 50 &&
+            50 + spawny > value.graphic.y - 50)) {
                 return true;
             }
             return false;
@@ -160,6 +160,8 @@ Crafty.init();
             highFlyingReady: true,
             highFlying: false,
             cooldown: false,
+            won: false,
+            lost: false,
           };
           document.addEventListener(
             "keydown",
@@ -212,6 +214,7 @@ Crafty.init();
             },
             false
           );
+          let music = new Audio('bgm1.mp3'); 
           let collide = false;
           let repositionTicks = 0;
           let highFlyingTicks = 0;
@@ -297,6 +300,8 @@ setInterval(() => {
                 document.body.style.backgroundImage = `url("../Jackdaws and Kestrels/jackdawfail.jpg")`;
                 document.body.style.backgroundRepeat = `no-repeat`;
                 document.body.style.backgroundSize = `100%`;
+                music.pause();
+                music.currentTime = 0;
                 const deathSound = new Audio('jackdawDeath.mp3'); 
                 deathSound.play();
             }
@@ -317,6 +322,17 @@ setInterval(() => {
             document.body.style.backgroundImage = `url("../Jackdaws and Kestrels/air.png")`;
             document.body.style.backgroundRepeat = `no-repeat`;
             document.body.style.backgroundSize = `100%`;
+            music.pause();
+            music.currentTime = 0;
+            if(!states.won)
+            {
+                const winsound = new Audio('wind.mp3'); 
+                winsound.play();
+                const wintheme = new Audio('skytheme.mp3'); 
+                wintheme.loop = true;
+                wintheme.play();
+            }
+            states.won = true;
         }
 
       if (keys.up) {
@@ -474,7 +490,9 @@ setInterval(() => {
                     value.treeStates.idle = false;
                     value.treeStates.wandering = false;
                     value.chaseTarget = player;
+                    value.speed = value.maxSpeed;
                     value.treeStates.chasing = true;
+                    value.actionTicks = 0;
                 }
             }
             if(value.treeStates.idle)
@@ -554,6 +572,8 @@ setInterval(() => {
       }
       if (states.initialized) {
         states.started = true;
+        music.loop = true;
+                music.play();
       }
     }
   }, 5);
