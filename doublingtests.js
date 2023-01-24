@@ -64,6 +64,17 @@ Crafty.init();
             }
         }
   }
+  class Level {
+    trees = [];
+    eggs = [];
+    kestrels = [];
+    constructor(trees,eggs,kestrels)
+    {
+        this.trees = trees;
+        this.eggs = eggs;
+        this.kestrels = kestrels;
+    }
+  }
     const players = [];
     const nest = [];
     let safex = 0;
@@ -72,71 +83,108 @@ Crafty.init();
     let required = 0;
     let score = 0;
     document.body.style.backgroundColor = "chartreuse";
-    for(let i = 0; i < 100; i++)
+    const overlapCheck = (x,y,array,adjustment=0) => 
     {
-        trees.push(new Tree("Tree",Math.random() * 2000,Math.random() * 1350));
-    }
-    for(let i = 0; i < 50; i++)
-    {
-        let x = Math.random() * 2000;
-            let y = Math.random() * 1350;
-        while(
-            trees.find((value,index,obj) => {
-                if(x < value.graphic.x + value.graphic.w && 
-                x + 50 > value.graphic.x &&
-                y < value.graphic.y + value.graphic.h &&
-                50 + y > value.graphic.y) {
-                    return true;
-                }
-                return false;
-            })
-        )
-        {
-            x = Math.random() * 2000;
-            y = Math.random() * 1350;
-        }
-        trees.push(new Tree("Egg",x,y));
-        required++;
-    }
-    for(let i = 0; i < 10; i++)
-    {
-        let kestx = Math.random() * 2000;
-            let kesty = Math.random() * 1350;
-        while(
-            trees.find((value,index,obj) => {
-                if(kestx < value.graphic.x + value.graphic.w && 
-                    kestx + 50 > value.graphic.x &&
-                    kesty < value.graphic.y + value.graphic.h &&
-                50 + kesty > value.graphic.y) {
-                    return true;
-                }
-                return false;
-            })
-        )
-        {
-            kestx = Math.random() * 2000;
-            kesty = Math.random() * 1350;
-        }
-        trees.push(new Tree("Kestrel",kestx,kesty));
-    }
-    let spawnx = Math.random() * 2000;
-    let spawny = Math.random() * 1350;
-    while(
-        trees.find((value,index,obj) => {
-            if((spawnx < value.graphic.x + value.graphic.w + 50 && 
-                spawnx + 50 > value.graphic.x - 50 &&
-                spawny < value.graphic.y + value.graphic.h + 50 &&
-            50 + spawny > value.graphic.y - 50)) {
+        return array.find((value,index,obj) => {
+            if(x < value.graphic.x + value.graphic.w + adjustment && 
+            x + 50 > value.graphic.x - adjustment &&
+            y < value.graphic.y + value.graphic.h + adjustment &&
+            50 + y > value.graphic.y - adjustment) {
                 return true;
             }
-            return false;
-        })
-    )
-    {
-        spawnx = Math.random() * 2000;
-        spawny = Math.random() * 1350;
+            return false;});
     }
-    players.push(new Player("Jackdaw",spawnx,spawny,5));
+    const spawnTrees = (name,amount) => {
+        if(name==="Tree")
+        {
+            for(let i = 0; i < amount; i++)
+            {
+                trees.push(new Tree(name,Math.random() * 2000,Math.random() * 1350));
+            }
+        }else{
+            for(let i = 0; i < amount; i++)
+            {
+                let x = Math.random() * 2000;
+                let y = Math.random() * 1350;
+                while(
+                    overlapCheck(x,y,trees)
+                )
+                {
+                    x = Math.random() * 2000;
+                    y = Math.random() * 1350;
+                }
+                trees.push(new Tree(name,x,y));
+                if(name==="Egg")
+                {
+                    required++;
+                }
+            }
+        }
+    }
+    const collisionEntity = () => {
+        return trees.find((value,index,obj) => {
+            if (
+                (player.graphic.x < value.graphic.x + value.graphic.w && 
+                player.graphic.x + player.graphic.w > value.graphic.x &&
+                player.graphic.y < value.graphic.y + value.graphic.h &&
+                player.graphic.h + player.graphic.y > value.graphic.y) && (!states.highFlying)
+              ) {
+                // Collision detected!
+                return true;
+              }else{
+                return false
+              }
+        });
+    }
+    const playerReactToCollison = (playerEntity) => 
+    {
+            if(collisionDirections.up)
+            {
+                playerEntity.graphic.y = playerEntity.graphic.y + 1;
+            }
+            if(collisionDirections.down)
+            {
+                playerEntity.graphic.y = playerEntity.graphic.y - 1;
+            }
+            if(collisionDirections.left)
+            {
+                playerEntity.graphic.x = playerEntity.graphic.x + 1;
+            }
+            if(collisionDirections.right)
+            {
+                playerEntity.graphic.x = playerEntity.graphic.x - 1;
+            }
+            if((collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right) && collisionEntity().entityName === "Tree")
+            {
+                playerEntity.graphic.x = safex;
+                playerEntity.graphic.y = safey;
+            }
+    }
+    const findTreeIndex = (entity) => {
+        return trees.findIndex((value,index,obj) => {
+            if(entity===value)
+            {
+                return true
+            }
+            return false;
+        });
+    }
+    const spawnPlayer = () => {
+        let spawnx = Math.random() * 2000;
+        let spawny = Math.random() * 1350;
+        while(
+            overlapCheck(spawnx,spawny,trees,50)
+        )
+        {
+            spawnx = Math.random() * 2000;
+            spawny = Math.random() * 1350;
+        }
+        players.push(new Player("Jackdaw",spawnx,spawny,5));
+    }
+    spawnTrees("Tree",100);
+    spawnTrees("Egg",1);
+    spawnTrees("Kestrel",10);
+    spawnPlayer();
     let player = players.find((value,index,obj) => {
         return value.playerName === "Jackdaw";
     });
@@ -236,7 +284,7 @@ setInterval(() => {
 
         if(repositionTicks>=50)
         {
-            if(!collide && !states.highFlying)
+            if(!collisionEntity() && !states.highFlying)
             {
                 safex = player.graphic.x;
                 safey = player.graphic.y;
@@ -257,40 +305,35 @@ setInterval(() => {
             }
         }
 
-        if(collide)
+        if(collisionEntity())
         {
-            if(player.graphic.y + player.graphic.h > collide.graphic.y + collide.graphic.h)
+            if(player.graphic.y + player.graphic.h > collisionEntity().graphic.y + collisionEntity().graphic.h)
             {
                 collisionDirections.up = true;
             }
-            if(player.graphic.y < collide.graphic.y)
+            if(player.graphic.y < collisionEntity().graphic.y)
             {
                 collisionDirections.down = true;
             }
-            if(player.graphic.x + player.graphic.w > collide.graphic.x + collide.graphic.w)
+            if(player.graphic.x + player.graphic.w > collisionEntity().graphic.x + collisionEntity().graphic.w)
             {
                 collisionDirections.left = true;
             }
-            if(player.graphic.x < collide.graphic.x)
+            if(player.graphic.x < collisionEntity().graphic.x)
             {
                 collisionDirections.right = true;
             }
-            if(collide.entityName === "Egg")
+            if(collisionEntity().entityName === "Egg")
             {
                 score++;
                 console.log(`Score: ${score}/${required}`);
-                trees[trees.findIndex((value,index,obj) => {
-                    if(collide===value)
-                    {
-                        return true
-                    }
-                    return false;
-                })] = new Tree("Null",-1000,-1000);
-                collide.graphic.destroy();
+                const index = findTreeIndex(collisionEntity());
+                trees[index].graphic.destroy();
+                trees[index] = new Tree("Null",-1000,-1000);
                 const collected = new Audio('eggCrack.mp3'); 
                 collected.play();
             }
-            if(collide.entityName === "Kestrel")
+            else if(collisionEntity().entityName === "Kestrel")
             {
                 trees.forEach((value,index,array) => {
                     value.graphic.destroy();
@@ -336,115 +379,35 @@ setInterval(() => {
         }
 
       if (keys.up) {
-        if (player.graphic.y > 0 && !(collide && collisionDirections.up)) {
+        if (player.graphic.y > 0 && !(collisionEntity() && collisionDirections.up)) {
             player.graphic.y-=1;
-        }else if(collide)
+        }else if(collisionEntity())
         {
-            if(collisionDirections.up)
-            {
-                player.graphic.y = player.graphic.y + 1;
-            }
-            if(collisionDirections.down)
-            {
-                player.graphic.y = player.graphic.y - 1;
-            }
-            if(collisionDirections.left)
-            {
-                player.graphic.x = player.graphic.x + 1;
-            }
-            if(collisionDirections.right)
-            {
-                player.graphic.x = player.graphic.x - 1;
-            }
-            if((collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right) && collide.entityName === "Tree")
-            {
-                player.graphic.x = safex;
-                player.graphic.y = safey;
-            }
+            playerReactToCollison(player);
         }
       }
       if (keys.down) {
-        if (player.graphic.y < 1350 && !(collide && collisionDirections.down)) {
+        if (player.graphic.y < 1350 && !(collisionEntity() && collisionDirections.down)) {
             player.graphic.y+=1;
-        }else if(collide)
+        }else if(collisionEntity())
         {
-            if(collisionDirections.up)
-            {
-                player.graphic.y = player.graphic.y + 1;
-            }
-            if(collisionDirections.down)
-            {
-                player.graphic.y = player.graphic.y - 1;
-            }
-            if(collisionDirections.left)
-            {
-                player.graphic.x = player.graphic.x + 1;
-            }
-            if(collisionDirections.right)
-            {
-                player.graphic.x = player.graphic.x - 1;
-            }
-            if((collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right) && collide.entityName === "Tree")
-            {
-                player.graphic.x = safex;
-                player.graphic.y = safey;
-            }
+            playerReactToCollison(player);
         }
       }
       if (keys.left) {
-        if (player.graphic.x > 0 && !(collide && collisionDirections.left)) {
+        if (player.graphic.x > 0 && !(collisionEntity() && collisionDirections.left)) {
             player.graphic.x-=1;
-        }else if(collide)
+        }else if(collisionEntity())
         {
-            if(collisionDirections.up)
-            {
-                player.graphic.y = player.graphic.y + 1;
-            }
-            if(collisionDirections.down)
-            {
-                player.graphic.y = player.graphic.y - 1;
-            }
-            if(collisionDirections.left)
-            {
-                player.graphic.x = player.graphic.x + 1;
-            }
-            if(collisionDirections.right)
-            {
-                player.graphic.x = player.graphic.x - 1;
-            }
-            if((collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right) && collide.entityName === "Tree")
-            {
-                player.graphic.x = safex;
-                player.graphic.y = safey;
-            }
+            playerReactToCollison(player);
         }
       }
       if (keys.right) {
-        if (player.graphic.x < 2000 && !(collide && collisionDirections.right)) {
+        if (player.graphic.x < 2000 && !(collisionEntity() && collisionDirections.right)) {
             player.graphic.x+=1;
-        }else if(collide)
+        }else if(collisionEntity())
         {
-            if(collisionDirections.up)
-            {
-                player.graphic.y = player.graphic.y + 1;
-            }
-            if(collisionDirections.down)
-            {
-                player.graphic.y = player.graphic.y - 1;
-            }
-            if(collisionDirections.left)
-            {
-                player.graphic.x = player.graphic.x + 1;
-            }
-            if(collisionDirections.right)
-            {
-                player.graphic.x = player.graphic.x - 1;
-            }
-            if((collisionDirections.up && collisionDirections.down && collisionDirections.left && collisionDirections.right) && collide.entityName === "Tree")
-            {
-                player.graphic.x = safex;
-                player.graphic.y = safey;
-            }
+            playerReactToCollison(player);
         }
       }
       if(keys.space)
@@ -573,7 +536,7 @@ setInterval(() => {
       if (states.initialized) {
         states.started = true;
         music.loop = true;
-                music.play();
+        music.play();
       }
     }
   }, 5);
