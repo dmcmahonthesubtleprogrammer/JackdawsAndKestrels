@@ -1,6 +1,7 @@
 let playerName = "";
 let highScorePosted = false;
-
+const continueText = document.getElementById("continueText");
+continueText.style.visibility = "hidden";
 Crafty.init();
   class Player {
     width = 50;
@@ -976,6 +977,7 @@ setInterval(() => {
       });
       let increase = 0;
     if (states.won) {
+        continueText.style.visibility = "visible";
         states.started =  false;
         states.initialized = false;
         if (keys.enter) {
@@ -1086,6 +1088,15 @@ setInterval(() => {
     }
     if (!states.started) {
       if (keys.enter) {
+        console.log(totalScore);
+        if (!states.won && totalScore<=0){
+            console.log(totalScore);
+            const startText = document.getElementById("beginText");
+            startText.parentNode.removeChild(startText);
+        }
+        if(!states.won){
+            continueText.style.visibility = "hidden";
+        }
         states.initialized = true;
       }
       if (states.initialized) {

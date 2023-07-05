@@ -47,6 +47,8 @@ input[type="text"]:focus {
       Crafty.init(0,1, document.getElementById('game'));
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <p id="beginText">Press enter to start!</p>
+    <p id="continueText">Press enter to go to the next level!</p>
     <p id="gameOverText">Enter your name here: </p>
     <input id="playerName" type="text" ></input>
     <input id="submitScore" type="submit"></input>
