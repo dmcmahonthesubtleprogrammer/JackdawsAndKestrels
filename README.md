@@ -1,5 +1,7 @@
 # JackdawsAndKestrels
 
+Thanks for checking out this project!
+
 This guide assumes that you have MAMP installed on your computer.
 
 Extract these files to your MAMP htdocs folder.
