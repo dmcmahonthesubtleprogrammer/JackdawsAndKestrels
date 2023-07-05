@@ -1,5 +1,9 @@
 # JackdawsAndKestrels
 
+This guide assumes that you have MAMP installed on your computer.
+
+Extract these files to your MAMP htdocs folder.
+
 Enter this url based on where your file is located
 http://localhost:81/yourfolderdirectory/Jackdaws%20and%20Kestrels/mainMenu.php
 
