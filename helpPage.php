@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  background-color: grey;
+}
+h1 {
+  font-size: 50px;
+}
+p {
+  font-size: 50px;
+}
+li {
+  font-size: 40px;
+}
+a:visited {
+  color: white;
+}
+#TitleHeader {
+  font-size: 100px;
+  text-align: center;
+}
+#MenuLink {
+  font-size: 75px;
+  text-align: center;
+}
+#MenuA {
+  border: 10px solid #ddd;
+  padding-right: 50px;
+  padding-left: 50px;
+  margin: 50px;
+  background-color: grey;
+}
+#Tree {
+  width: 100px;
+  height: 100px;
+  background-color: sienna;
+}
+#Nest {
+  width: 100px;
+  height: 100px;
+  background-color: darkgoldenrod;
+}
+#Kestrel {
+  width: 50px;
+  height: 50px;
+  background-color: chocolate;
+}
+#Bluejay {
+  width: 50px;
+  height: 50px;
+  background-color: blue;
+}
+#Hawk {
+  width: 50px;
+  height: 50px;
+  background-color: brown;
+}
+#Egg {
+        width: 50px;
+        height: 50px;
+        background-color: white;
+      }
+#Red {
+  color: red;
+}
+#Aqua {
+  color: aqua;
+}
+</style>
+</head>
+<body>
+  <h1 id="TitleHeader">Instructions</h1>
+  <p>You are a Jackdaw. Your goal is simple. Steal eggs from the local birds so you don't go hungry. Easier said than done, though.</p>
+  <p>Nature's a cruel mistress, so you'll need to know how to move quickly and understand the behaviors of the other birds around you in order to survive. Luckily, I'm here to help.</p>
+  <h1> Controls </h1>
+  <ul>
+    <li>W - Move Up</li>
+    <li>A - Move Left</li>
+    <li>S - Move Down</li>
+    <li>D - Move Right</li>
+    <li>Space - Fly high over obstacles, such as trees <div id="Tree"></div>. This does not work against other birds, since they can fly high as well.</li>
+  </ul>
+  <h1> Goals </h1>
+  <p>Eggs</p>
+  <div id="Egg"></div>
+  <p>Collect all the eggs in the level to win.</p>
+  <p>Don't die.</p>
+  <h1> Points of Interest </h1>
+  <p>Trees</p> <div id="Tree"></div>
+  <p>Trees need to be either flown over or navigated around in order to get past them.</p>
+  <p>Nests</p> <div id="Nest"></div>
+  <p>Use nests to hide away from other birds when things get dicey. No bird will be able to find or touch you while you are in one. </p>
+  <h1> Birds </h1>
+  <p> Kestrels</p><div id="Kestrel"></div>
+  <p>These falcons have very tasty eggs. Unfortunately, they are quite protective of them, and will pursue you if they catch you near one.</p>
+  <p> Bluejays</p><div id="Bluejay"></div>
+  <p>These annoying corvids are real jerks, and will chase you on sight, regardless of if you are near an egg or not. Luckily, they are a bit slower than Kestrels.</p>
+  <p> Red-Tailed Hawks</p><div id="Hawk"></div>
+  <p>A very dangerous bird. This bird of prey strikes when you least expect it. Listen for its signature cry and watch out if you notice that it's outline has turned <span id="Red">red</span>. This means you only have a few seconds to get to a nest</p> <div id="Nest"></div> <p>before the hawk comes for you. The Red-Tailed Hawk is impossible to escape unless you are able to reach a nest.</p>
+  <h1> Additional Details </h1>
+  <p id="Aqua">Invulnerability</p>
+  <p>While invulnerable, you are not able to be killed by any birds. This is signified by a <span id="Aqua">blue</span>-colored outline appearing around the jackdraw while in contact with an in-game object.</p>
+  <p>Here are the scenarios in which you will be invulnerable: </p>
+  <ul>
+    <li>A few seconds after starting a new level</li>
+    <li>While inside of a nest (as stated above)</li>
+  </ul>
+  <p>Keep this in mind, and use it to your advantage.</p>
+  <p><strong>Score</strong></p>
+  <p>Score is awarded based on how long you take to complete a level, and how many obstacles are in the level.</p>
+  <p>The more dangerous a level is, and the faster you are able to complete a level, the higher your score will be in the end.</p>
+  <p>The amount of obstacles increases by one each level, so watch for any new dangers that may appear.</p>
+  <h1> That's it... for now </h1>
+  <p>Good luck, and collect many eggs, brave young Jackdaw!</p>
+  <h1 id="MenuLink"><a id="MenuA" href="mainMenu.php">Back</a></h1>
+  <audio  autoplay loop style="display: none;">
+    <source src="Vice City Docks Drug Deal Soundtrack (Synth & Guitar Cover).mp3" type="audio/mp3">
+  </audio>
+</body>
+<script></script>
